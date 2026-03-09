@@ -19,3 +19,18 @@ target
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+
+# Added by cargo
+
+# Ignoriert den Ordner mit den riesigen kompilierten Dateien
+/target/
+
+# Ignoriert temporäre Backup-Dateien vom Formatierer
+**/*.rs.bk
+
+# Ignoriert Windows Debug-Dateien (falls du Windows nutzt)
+*.pdb
+
+# Contains mutation testing data
+**/mutants.out*/
