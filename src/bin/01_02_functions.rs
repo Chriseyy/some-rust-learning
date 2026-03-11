@@ -134,6 +134,49 @@ fn get_user_info() -> (String, i32) {
     (name, age) 
 }
 
+struct User {
+    name: String,
+    age: i32,
+}
+fn create_user() -> User {
+    User {
+        name: String::from("Chris"),
+        age: 30,
+    }
+}
+// complex example
+
+// some import stuff -> gives return type of the function, and the value of the last expression in the function body is returned as the return value of the function.
+// if not specified, the return type of the function is () which is the unit type that represents the absence of a value.
+// if type wrong error, the compiler will give an error because the return type of the function does not match the type of the value being returned in the function body.
+// fn get_name() -> String {
+//     42 // ERROR: expected `String`, found integer
+// }
+// if no -> for return error:
+// fn get_number() {  // Compiler denkt: -> ()
+//     5 // error: expected `()`, found integer
+//     same with return 5; 
+// }
+// what works is print stuff:
+// fn get_number() {  // Compiler thinks: -> ()
+//     println!("The number is: {}", 5); // this will print the number to the console, but it will not return a value from the function, and the return type of the function will be () which is the unit type that represents the absence of a value.
+// }
+// but you can use return in function 
+
+// Early Returns
+fn say_hello(name: &str) { 
+    if name == "" {
+        println!("No name provided!");
+        return; 
+    }
+    
+    println!("Hello, {}!", name);
+}
+// In this example, the sag_hallo function takes a parameter name of type &str and does not return any value (return type is ()), but it uses an early return to exit the function if the name parameter is an empty string. 
+// If the name parameter is an empty string, the function will print a message to the console and then return immediately, without executing the rest of the function body. 
+// If the name parameter is not an empty string, the function will print a greeting message to the console that includes the name parameter.
+
+
 
 fn main() {
     println!("Hello, world!");
@@ -155,8 +198,14 @@ fn main() {
     let str2 = return_string_example(); // this will call the return_string_example function and assign its return value to the variable str, which can then be used in the code that follows.
     println!("The value of str is: {str2}");
 
+    let user = create_user(); // this will call the create_user function and assign its return value, which is a User struct, to the variable user. You can then access the fields of the User struct using dot notation, like user.name and user.age.
+    println!("User name: {}, User age: {}", user.name, user.age);
+
     let user_info = get_user_info();  // destructuring the tuple returned by the get_user_info function into separate variables name and age
     let (name, age) = get_user_info(); // this will call the get_user_info function and destructure the returned tuple into separate variables name and age.
     println!("User info: {:?}", user_info);
     println!("Name: {}, Age: {}", name, age);
+
+    say_hello(""); // this will call the say_hello function with an empty string as the argument, which will trigger the early return and print "No name provided!" to the console.
+    say_hello("Alice"); // this will call the say_hello function with the argument
 }
