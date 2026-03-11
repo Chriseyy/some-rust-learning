@@ -1,4 +1,27 @@
 
+
+// to declare a variable, we use the let keyword, followed by the variable name and an optional type annotation.
+// The syntax for declaring a variable is as follows:
+// let variable_name: type = value; 
+
+fn start_idea() {
+    let x = 5; // this is an immutable variable, we cannot change its value
+    println!("The value of x is: {x}");
+
+    let mut y = 10; // this is a mutable variable, we can change its value
+    println!("The value of y is: {y}");
+    y = 15; // we can change the value of y because it is mutable
+    println!("The value of y is: {y}");
+
+    let z: i32 = 20; // this is a variable with a type annotation, we can change its value and shows how big the variable is in memory, in this case 4 bytes because i32 is a 32-bit integer
+    println!("The value of z is: {z}");
+    // z = 25; // this will cause an error because z is immutable
+    // you can also declare a variable without initializing it, but you must specify the type annotation in this case
+    let a: i32; // this is a variable declaration without initialization
+    a = 30; // we can initialize the variable later
+    println!("The value of a is: {a}");
+}
+
 // Variables and Mutablility
 
 fn variab_mut() {
@@ -93,6 +116,7 @@ fn shadowing2() {
 
 
 fn main() {
+    start_idea();
     variab_mut();
     declaing_const();
     shadowing();
