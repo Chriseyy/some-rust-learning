@@ -87,9 +87,9 @@ fn memory_example_2() {
     println!("x: {}, y: {}", x, y);
 
     let s1 = String::from("hello");
-    let s2 = s1; // s2 takes ownership of the string, and s1 is no longer valid
+    let s2 = s1; // s2 takes ownership of the string, and s1 is no longer valid  / this is shallow copy casue s1 wont work after 
     // if you dont want ownership to be moved, you can use the clone method to create a copy of the string data on the heap. This will allow both s1 and s2 to be valid and independent of each other.
-    // let s2 = s1.clone(); // s2 is a clone of s1, and both s1 and s2 are valid
+    // let s2 = s1.clone(); // s2 is a clone of s1, and both s1 and s2 are valid / this is deep copy cause s1 still workds after 
     println!("s2: {}", s2);
     // println!("s1: {}, s2: {}", s1, s2); // this will cause a compile-time error because s1 is no longer valid after it is moved to s2        
 } 
@@ -135,6 +135,87 @@ fn scope_example_4() {
 
 
 // Variables and Data interaction with Clone:
+// if we do want to deeply copy the the heap data you can use the clone Methode
+
+fn deeply_copy_example()  {
+    let s1 = String::from("hello");
+    let s2 = s1.clone();
+
+    println!("s1 = {s1}, s2 = {s2}");
+}
+// clone: aribitary code is being executed and that code may be expensive 
+
+
+// Stack-Only Data: Copy 
+fn stack_only_copy_example() {
+    let x = 5;
+    let y = x;
+
+    println!("x = {x}, y = {y}");
+}
+// no clone needed cause  integers that have a known size at compile time are stored entirely on the stack
+// Simple stack copy 
+
+fn important_copys() {
+    // 1. Simple Stack Copy (Not shallow or deep, just a basic copy)
+    let x = 5;
+    let y = x; 
+    println!("{}",y);
+
+    // 2. Shallow Copy / MOVE (Only pointer is copied, s1 is killed)
+    let s1 = String::from("Hello");
+    let s2 = s1; 
+    println!("{}",s2);
+
+    // 3. DEEP COPY (Heap data is duplicated, both s3 and s4 are valid and independent)
+    let s3 = String::from("World");
+    let s4 = s3.clone();
+
+    println!("{}",s4);
+}
+
+// Copy trait: 
+// Rust has a special annotation called the Copy trait that we can place on types that are stored on the stack, as integers are (we’ll talk more about traits in Chapter 10). 
+// If a type implements the Copy trait, variables that use it do not move, but rather are trivially copied, making them still valid after assignment to another variable.
+// So, what types implement the Copy trait? You can check the documentation for the given type to be sure, but as a general rule, any group of simple scalar values can implement Copy, 
+// and nothing that requires allocation or is some form of resource can implement Copy. Here are some of the types that implement Copy:
+
+// All the integer types, such as u32.
+// The Boolean type, bool, with values true and false.
+// All the floating-point types, such as f64.
+// The character type, char.
+// Tuples, if they only contain types that also implement Copy. For example, (i32, i32) implements Copy, but (i32, String) does not.
+
+
+
+// Ownership and Functions
+
+fn ownership_example() {
+    let s = String::from("hello");  // s comes into scope
+
+    takes_ownership(s);             // s's value moves into the function...
+                                    // ... and so is no longer valid here
+    // println!("{}",s);  // wont work anymore case ownership is now long - error 
+    // fix would be takes_ownership(s.clone()); 
+
+    let x = 5;                      // x comes into scope
+
+    makes_copy(x);                  // Because i32 implements the Copy trait,
+                                    // x does NOT move into the function,
+                                    // so it's okay to use x afterward.
+    println!("{}",x);               // works still cause it makes copy of x and donest steal ownership                        
+
+} // Here, x goes out of scope, then s. However, because s's value was moved,
+  // nothing special happens.
+
+fn takes_ownership(some_string: String) { // some_string comes into scope
+    println!("{some_string}");
+} // Here, some_string goes out of scope and `drop` is called. The backing
+  // memory is freed.
+
+fn makes_copy(some_integer: i32) { // some_integer comes into scope
+    println!("{some_integer}");
+} // Here, some_integer goes out of scope. Nothing special happens.
 
 
 fn main() {
@@ -156,4 +237,13 @@ fn main() {
     println!("Scope and Assignments:");
     scope_example_3();
     scope_example_4();
+
+    println!("Variables and Data interaction with Clone:");
+    deeply_copy_example();
+    stack_only_copy_example();
+    important_copys();
+
+    println!("------------------------------");
+    println!("Ownership and Function:");
+    ownership_example();
 }
