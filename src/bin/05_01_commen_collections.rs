@@ -55,8 +55,10 @@ fn enum_vec() {
 fn reading_elements() {
     let v = vec![1, 2, 3, 4, 5];
 
-    let third: &i32 = &v[2]; // get the third element of the vector
+    let third: &i32 = &v[2]; // get the third element of the vector  // can steal value from vector let thrid = v[2]; // this will move the value out of the vector and we cannot use the vector anymore, because the value has been moved out of the vector, so we need to take a reference to the value instead of moving it out of the vector
     println!("The third element is {}", third);
+
+    let third: i32 = v[2]; // this will work asue i32 is small and implements the Copy trait, so we can copy the value out of the vector without moving it out of the vector, but this is not recommended because we lose type safety and we can push any type of value to the vector, which can lead to runtime errors
 
     match v.get(2) { // get the third element of the vector using get method
         Some(third) => println!("The third element is {}", third),
@@ -88,6 +90,12 @@ fn interating_over_vector() {
     let mut v = vec![100, 32, 57];   // create a mutable vector
     for i in &mut v {
         *i += 50; 
+    }
+
+    for idx in 0..v.len() {
+        v[idx] += 50;
+
+    print!("{} ", v[idx]);
     }
 }
 
