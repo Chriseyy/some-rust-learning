@@ -109,6 +109,29 @@ fn hashmap_key_struct() {
 }
 
 
+fn hashmap_functions() {
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Yellow"), 50);
+
+    // check if a key exists in the hashmap
+    let team_name = String::from("Blue");
+    if scores.contains_key(&team_name) { // contains_key returns a bool, so we can use it in an if statement
+        println!("The team {} exists in the hashmap", team_name);
+    } else {
+        println!("The team {} does not exist in the hashmap", team_name);
+    }
+
+    // remove a key-value pair from the hashmap
+    scores.remove(&team_name); // remove returns an Option<V>, so we can use match or unwrap to get the value
+    match scores.get(&team_name) {
+        Some(score) => println!("The score of {} is {}", team_name, score),
+        None => println!("The team {} does not exist", team_name),
+    }
+}
+
+
 // A Hashmap is like a dict in Python, it is a collection of key-value pairs, where each key is unique and maps to a value. In Rust, Hashmaps are implemented using the HashMap struct from the std::collections module. The keys and values can be of any type that implements the Eq and Hash traits. The HashMap struct provides methods for inserting, accessing, and removing key-value pairs, as well as iterating over the keys and values.
 // Hashmap key value pairs are stored in a random order, so the order of the keys and values is not guaranteed to be the same as the order in which they were inserted. If you need to maintain the order of the keys and values, you can use a BTreeMap instead of a HashMap. A BTreeMap is a sorted map that maintains the order of the keys and values based on their natural ordering or a custom ordering defined by a comparator function. However, BTreeMaps are generally slower than HashMaps for large datasets, so you should choose the appropriate data structure based on your specific use case and performance requirements.
 fn main() {
@@ -118,6 +141,7 @@ fn main() {
     updating_hashmap();
     hashmap_other_key_int();
     hashmap_key_struct();
+    hashmap_functions();
 }
 
 
