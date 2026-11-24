@@ -1,17 +1,48 @@
+// =============================================================================
+// COMMENTS IN RUST
+// -----------------------------------------------------------------------------
+// Comments are ignored by the compiler, except doc comments (`///`), which
+// `cargo doc` turns into HTML documentation.
+//
+// Three types of comments:
+// 1. Line comments:  `// ...`
+// 2. Block comments: `/* ... */`
+// 3. Doc comments:   `/// ...` (supports Markdown)
+// =============================================================================
 
-
-// Comments
-
-// comments are ignored by the compiler, but they are important for human readers of the code. They can explain what the code is doing, why it is doing it, and how it works.
-// There are two types of comments in Rust: line comments and block comments.
+/// Returns the user's lucky number.
+///
+/// # Examples
+/// ```text
+/// let n = get_lucky_number();
+/// assert_eq!(n, 7);
+/// ```
+fn get_lucky_number() -> i32 {
+    7
+}
 
 fn main() {
-    let lucky_number1 = 7; // I'm feeling lucky today
+    // 1. Line comment (most common in Rust)
+    let lucky_number1 = 7; // Inline comment at the end of a line
 
+    /*
+     * 2. Block comment (multi-line)
+     * Useful for longer explanations or temporarily disabling a block of code.
+     */
+    let lucky_number2 = get_lucky_number();
 
-    // I'm feeling lucky today
-    let lucky_number2 = 7;
-
-    println!("Lucky number 1: {}", lucky_number1);
-    println!("Lucky number 2: {}", lucky_number2);
+    println!("Lucky number 1: {lucky_number1}");
+    println!("Lucky number 2: {lucky_number2}");
 }
+
+/*
+================================================================================
+                         SUMMARY & BEST PRACTICES
+================================================================================
+- Use `//` for regular code comments (idiomatic Rust prefers `//` even for
+  multiple lines).
+- Use `/* ... */` for large blocks or inline comments inside an expression.
+- Use `///` above functions, structs, or enums to generate documentation with
+  `cargo doc --open`.
+================================================================================
+*/
