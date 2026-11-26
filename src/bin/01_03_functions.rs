@@ -48,8 +48,10 @@ fn some_random_text_with_parameters(text: &str) {
 
 fn add_stuff() {
     println!("=== STATEMENTS & EXPRESSIONS DEMO ===");
-    
-    // A block `{ ... }` is an expression that evaluates to its last expression (`x + 1`)
+
+    // A block `{ ... }` is BOTH an expression AND its own syntactic scope
+    // (`x` only exists inside this block and is dropped after `}`).
+    // It evaluates to its last expression (`x + 1`).
     let y = {
         let x = 3;
         x + 1 // Note: No semicolon! This line evaluates to 4.
@@ -80,12 +82,12 @@ fn number_plus_one(x: i32) -> i32 {
 fn check_age(age: i32) -> String {
     // Early return if the condition is met
     if age < 18 {
-        return String::from("TOOO YOUNG"); 
+        return String::from("TOOO YOUNG");
     }
-    
+
     println!("Age passed");
     // Final expression (implicit return)
-    String::from("HELLLLOO!") 
+    String::from("HELLLLOO!")
 }
 
 fn return_string_example() -> String {
@@ -94,7 +96,7 @@ fn return_string_example() -> String {
 
 
 // =============================================================================
-// SECTION 5: RETURNING RETURNING COMPLEX TYPES (TUPLES & STRUCTS)
+// SECTION 5: RETURNING COMPLEX TYPES (TUPLES & STRUCTS)
 // Functions can return complex structures, including Tuples, Structs, Enums, etc.
 // =============================================================================
 
@@ -123,12 +125,12 @@ fn create_user() -> User {
 // You can use a bare `return;` statement to exit early from a `()` function.
 // =============================================================================
 
-fn say_hello(name: &str) { 
+fn say_hello(name: &str) {
     if name == "" {
         println!("No name provided!");
         return; // Exits early without executing the remaining lines
     }
-    
+
     println!("Hello, {}!", name);
 }
 
@@ -151,8 +153,8 @@ fn main() {
     println!("The result is: {result}");
 
     // Calling functions and dropping the return value
-    number_plus_one(1); 
-    return_string_example(); 
+    number_plus_one(1);
+    return_string_example();
     println!("\n");
 
     println!("=== 3. EARLY RETURNS & COMPLEX TYPES ===");
@@ -167,14 +169,14 @@ fn main() {
     println!("User name: {}, User age: {}", user.name, user.age);
 
     // Tuple returns and destructuring
-    let user_info = get_user_info();  
+    let user_info = get_user_info();
     let (name, age) = get_user_info(); // Unpacking tuple into separate variables
     println!("User info tuple: {:?}", user_info);
     println!("Destructured Name: {}, Age: {}", name, age);
     println!("\n");
 
     println!("=== 4. EARLY RETURN UNIT DEMO ===");
-    say_hello("");     // Triggers early return
+    say_hello("");      // Triggers early return
     say_hello("Alice"); // Completes full function body
     println!("\n");
 
@@ -212,6 +214,11 @@ fn demo_common_compiler_errors() {
     //     x + 1; // Adding `;` converts this expression into a statement returning `()`
     // } 
     // ERROR: expected `i32`, found `()`.
+
+    // Error 5: Assigning a `let` Statement to a Variable
+    // let x = (let y = 6);
+    // ERROR: expected expression, found `let` statement
+    // (Unlike C or Ruby, `let` statements do not return a value in Rust.)
 }
 
 /*
@@ -223,8 +230,9 @@ fn demo_common_compiler_errors() {
 -------------------------------------
 - Expressions return a value and DO NOT end with a semicolon `;`.
 - Statements perform an action and DO end with a semicolon `;`.
-- A block `{ ... }` evaluates to its last expression. This is heavily used in 
-  `let` assignments, `match` arms, and function return values.
+- A block `{ ... }` is both an expression (evaluates to its last expression)
+  and a syntactic scope (variables declared inside are dropped after `}`).
+  This is heavily used in `let` assignments, `match` arms, and return values.
 
 
 2. IMPLICIT RETURNS VS. EXPLICIT RETURNS

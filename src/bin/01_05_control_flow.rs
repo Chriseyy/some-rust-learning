@@ -5,6 +5,8 @@
 // 1. The condition MUST evaluate strictly to a `bool`. Rust does NOT automatically 
 //    convert integers or pointers to booleans (no "truthy" values like in JS/Python).
 // 2. Multi-branch `if / else if / else` chains are evaluated sequentially.
+//    Rust only executes the FIRST branch whose condition evaluates to `true`
+//    and skips all remaining branches.
 // =============================================================================
 
 fn if_example_1() {
@@ -54,6 +56,8 @@ fn if_example_4() {
     println!("=== 4. MULTIPLE MODULO CHECKS ===");
     let number = 6;
 
+    // Note: Even though 6 is also divisible by 2, only the `number % 3 == 0`
+    // arm runs because Rust stops checking after the first matching condition.
     if number % 4 == 0 {
         println!("number is divisible by 4");
     } else if number % 3 == 0 {
@@ -68,10 +72,11 @@ fn if_example_4() {
 
 // Because `if` is an expression, it can be assigned directly into a `let` statement.
 fn if_example_5() {
-    println!("=== 5. IF AS AN EXPRESSION IN ASSIGNMENTS ===");
+    println!("=== 5. IF AS AN EXPRESSION & DEFERRED INITIALIZATION ===");
     let condition = true;
     
-    // Both arms must return the EXACT same type so the compiler can determine type at compile time.
+    // Both arms must return the EXACT same type so the compiler can determine
+    // the variable's single static type at compile time.
     let number = if condition { 5 } else { 6 };
 
     // Invalid example:
@@ -79,6 +84,19 @@ fn if_example_5() {
     // ERROR: `if` and `else` have incompatible types (`i32` vs `&str`).
 
     println!("The value of number is: {number}");
+
+    // Deferred Initialization (without `mut`):
+    // You can declare an immutable variable first and initialize it inside an `if/else`.
+    // Rust does NOT require `let mut x;` here because the compiler can statically prove
+    // that only ONE branch will ever execute, so `x` is guaranteed to be assigned
+    // exactly once before it is used.
+    let x;
+    if condition {
+        x = 1;
+    } else {
+        x = 2;
+    }
+    println!("Deferred immutable x: {x}");
 
     let number = 6;
     let is_divisible_by_4 = if number % 4 == 0 {
@@ -167,8 +185,9 @@ fn loop_example_4() -> i32 {
     // println!("This will never print!");
 }
 
-// Disambiguation with Loop Labels ('label:)
-// Labels allow `break` or `continue` to target outer loops specifically.
+// Disambiguation with Loop Labels (`'label:`)
+// Labels must begin with a single quote (`'`) and allow `break` or `continue`
+// to target a specific outer loop instead of the innermost one.
 fn loop_example_5() {
     println!("=== 9. LABELED LOOPS ===");
     let mut count = 0;
@@ -180,7 +199,7 @@ fn loop_example_5() {
         loop {
             println!("remaining = {remaining}");
             if remaining == 9 {
-                break; // Breaks inner loop
+                break; // Breaks inner loop only
             }
             if count == 2 {
                 break 'counting_up; // Breaks outer loop labeled `'counting_up`
@@ -235,9 +254,12 @@ fn while_example_2() {
 
 // =============================================================================
 // SECTION 4: ITERATING WITH `for` LOOPS
-// `for` loops are the safest and most idiomatic way to iterate over collections
-// (arrays, vectors) or numerical ranges in Rust.
-// Prevents out-of-bounds indexing bugs inherent to manual index counters.
+// `for` loops are the safest, fastest, and most idiomatic way to iterate over
+// collections (arrays, vectors) or numerical ranges in Rust.
+// Why `for` beats `while` for collections:
+// - Safety: Eliminates out-of-bounds indexing panics if the collection size changes.
+// - Performance: The compiler does not need to insert runtime bounds checks on
+//   every single iteration like `a[index]` does.
 // =============================================================================
 
 fn for_example_1() {
@@ -261,12 +283,21 @@ fn for_example_2() {
 }
 
 fn for_example_3() {
-    println!("=== 14. FOR LOOP WITH RANGES ===");
+    println!("=== 14. FOR LOOP WITH RANGES & IDIOMATIC COUNTDOWN ===");
     // `1..=5` is an inclusive range (1, 2, 3, 4, 5).
-    // `1..5` would be an exclusive range (1, 2, 3, 4).
+    // `1..5` is an exclusive range (1, 2, 3, 4 — stops before 5).
     for i in 1..=5 {
         println!("the value is: {i}");
     }
+
+    // Idiomatic Rust countdown using a Range + `.rev()`:
+    // Preferred over `while` loops for fixed counts because it needs no mutable counter.
+    // `(1..4)` yields 1, 2, 3 -> `.rev()` reverses it to 3, 2, 1.
+    println!("--- Countdown with (1..4).rev() ---");
+    for number in (1..4).rev() {
+        println!("{number}!");
+    }
+    println!("LIFTOFF!!!");
     println!("\n");
 }
 
@@ -292,16 +323,37 @@ fn for_example_5_reverse() {
     println!("\n");
 }
 
-fn for_exmple_6_while() {
+fn for_example_6_while() {
     println!("=== 17. MANUAL ARRAY ITERATION WITH WHILE ===");
     let a = [10, 20, 30, 40, 50];
     let mut index = 0;
 
-    // Less idiomatic: prone to runtime panics if boundary logic is flawed
+    // Less idiomatic: prone to runtime panics if boundary logic is flawed,
+    // and slower because `a[index]` performs a bounds check on every iteration.
     while index < a.len() {
         println!("the value is: {}", a[index]);
         index += 1;
     }
+    println!("\n");
+}
+
+fn for_example_7_array_repeat_syntax() {
+    println!("=== 18. ARRAY REPEAT SYNTAX TRAP (`[val; len]` vs `[a, b]`) ===");
+    // IMPORTANT SYNTAX DISTINCTION:
+    // - `[5; 10]` (semicolon) creates an array of length 10 where EVERY element is 5:
+    //   `[5, 5, 5, 5, 5, 5, 5, 5, 5, 5]` -> sum = 50.
+    // - `[5, 10]` (comma) creates an array of length 2 containing only 5 and 10:
+    //   sum = 15.
+    let repeated = [5; 10];
+    let mut sum = 0;
+    for x in repeated {
+        sum += x;
+    }
+    println!("Sum of [5; 10] (ten 5s): {sum}");
+
+    let two_elements = [5, 10];
+    let sum_two: i32 = two_elements.iter().sum();
+    println!("Sum of [5, 10] (5 + 10): {sum_two}");
     println!("\n");
 }
 
@@ -313,12 +365,12 @@ fn for_exmple_6_while() {
 // =============================================================================
 
 fn match_example() {
-    println!("=== 18. MATCH CONTROL FLOW ===");
+    println!("=== 19. MATCH CONTROL FLOW ===");
     let number = 3;
 
     match number {
         1 => println!("Eins!"),
-        2 | 3 => println!("Zwei oder Drei!"),        // Multiple pattern matching
+        2 | 3 => println!("Zwei oder Drei!"),          // Multiple pattern matching
         4..=10 => println!("Zwischen Vier und Zehn!"), // Inclusive range pattern
         _ => println!("Irgendeine andere Zahl!"),      // Catch-all placeholder
     }
@@ -333,7 +385,7 @@ fn match_example() {
 // =============================================================================
 
 fn if_let_example() {
-    println!("=== 19. IF LET DEMO ===");
+    println!("=== 20. IF LET DEMO ===");
     let some_option = Some(5);
 
     if let Some(value) = some_option {
@@ -345,7 +397,7 @@ fn if_let_example() {
 }
 
 fn while_let_example() {
-    println!("=== 20. WHILE LET DEMO ===");
+    println!("=== 21. WHILE LET DEMO ===");
     let mut some_option = Some(0);
 
     // Continuously runs as long as `some_option` matches `Some(value)`
@@ -369,7 +421,7 @@ fn while_let_example() {
 // =============================================================================
 
 fn testing_macros_demo() {
-    println!("=== 21. TESTING MACROS DEMO ===");
+    println!("=== 22. TESTING MACROS DEMO ===");
     
     // `assert!`: Panics if the expression evaluates to `false`
     assert!(true);
@@ -414,7 +466,8 @@ fn main() {
     for_example_3();
     for_example_4();
     for_example_5_reverse();
-    for_exmple_6_while();
+    for_example_6_while();
+    for_example_7_array_repeat_syntax();
 
     match_example();
 
@@ -432,6 +485,10 @@ fn main() {
 1. IF EXPRESSIONS vs. MATCH EXPRESSIONS
 ---------------------------------------
 - Use `if` for simple boolean checks or two-way conditional assignments.
+- Remember: `if` conditions must be strictly `bool` (no truthy/falsy values),
+  and all arms of an `if/else` assignment must return the same type.
+- Deferred initialization (`let x;` without `mut`) is allowed if every branch
+  assigns `x` at most once before use.
 - Use `match` for complex multi-branch conditions, range checks, enum variants,
   or when exhaustive compiler checking is required.
 
@@ -441,8 +498,9 @@ fn main() {
 - `loop`: Best for infinite loops (e.g., servers, game loops) or when you need 
   to return a value from a loop using `break value;`.
 - `while`: Best for repeating execution based on a single changing boolean condition.
-- `for`: Preferred idiomatic choice for iterating over arrays, collections, ranges, 
-  or iterators. It eliminates out-of-bounds indexing panics at runtime.
+- `for`: Preferred idiomatic choice for iterating over arrays, collections, ranges
+  (e.g., `(1..4).rev()`), or iterators. It eliminates out-of-bounds indexing panics
+  and avoids per-iteration runtime bounds checks.
 
 
 3. LOOP LABELS & SCOPE CONTROLS
